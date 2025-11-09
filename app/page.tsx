@@ -209,10 +209,7 @@ export default function Home() {
             Bank Statement Analyzer
           </h1>
           <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
-            Upload a bank statement PDF and we will extract and categorize every
-            transaction using Google Gemini, the Vercel AI SDK, and Langsmith
-            tracing. You can fine-tune the suggested categories before saving
-            your results elsewhere.
+            Upload a bank statement PDF and let AI extract, categorize, and summarize your spending.
           </p>
         </div>
         {!hasSubmitted ? (
