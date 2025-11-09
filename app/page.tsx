@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col gap-10">
       <section className="flex flex-col gap-4 justify-center items-center">
-        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight">
+        <h1 className="text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight">
           Bank Statement Analyzer
         </h1>
         <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
