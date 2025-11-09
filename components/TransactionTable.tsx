@@ -32,7 +32,7 @@ export const TransactionTable = ({
     <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/60 shadow-sm h-[60vh] flex flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
         <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
-        <thead className="bg-neutral-100 dark:bg-neutral-900/80">
+        <thead className="sticky top-0 z-10 bg-neutral-100/95 dark:bg-neutral-900/90 backdrop-blur supports-[backdrop-filter]:bg-neutral-100/80 dark:supports-[backdrop-filter]:bg-neutral-900/70">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
               Date

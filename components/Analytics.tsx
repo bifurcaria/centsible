@@ -38,6 +38,30 @@ const currency = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
+const formatCompactNumber = (value: number) => {
+  try {
+    const formatted = new Intl.NumberFormat("en-US", {
+      notation: "compact",
+      compactDisplay: "short",
+      maximumFractionDigits: 1,
+    }).format(Math.abs(value));
+    const sign = value < 0 ? "-" : "";
+    return (sign + formatted).toLowerCase();
+  } catch {
+    const abs = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+    if (abs >= 1_000_000_000)
+      return `${sign}${(abs / 1_000_000_000)
+        .toFixed(1)
+        .replace(/\.0$/, "")}b`;
+    if (abs >= 1_000_000)
+      return `${sign}${(abs / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
+    if (abs >= 1_000)
+      return `${sign}${(abs / 1_000).toFixed(1).replace(/\.0$/, "")}k`;
+    return `${value}`;
+  }
+};
+
 export function Analytics({
   transactions,
   isCategorizing = false,
@@ -145,6 +169,10 @@ export function Analytics({
                 },
                 y: {
                   grid: { color: "rgba(255,255,255,0.06)" },
+                  ticks: {
+                    callback: (value: string | number) =>
+                      formatCompactNumber(Number(value)),
+                  },
                 },
               },
             }}

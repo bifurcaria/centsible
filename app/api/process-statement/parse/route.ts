@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 
 const parsingSchema = z.array(
   z.object({
-    date: z.string(),
+    date: z.string().describe("The date of the transaction in the format YYYY-MM-DD"),
     description: z.string(),
     amount: z.number(),
   }),
