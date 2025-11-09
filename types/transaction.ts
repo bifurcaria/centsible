@@ -5,5 +5,3 @@ export type Transaction = {
   amount: number;
   category: string;
 };
-
-

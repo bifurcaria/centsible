@@ -9,18 +9,18 @@ type TransactionTableProps = {
 
 const formatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD"
+  currency: "USD",
 });
 
 export const TransactionTable = ({
   transactions,
-  setTransactions
+  setTransactions,
 }: TransactionTableProps) => {
   const handleCategoryChange = (id: string, category: string) => {
     setTransactions((prev) =>
       prev.map((transaction) =>
-        transaction.id === id ? { ...transaction, category } : transaction
-      )
+        transaction.id === id ? { ...transaction, category } : transaction,
+      ),
     );
   };
 
@@ -54,7 +54,10 @@ export const TransactionTable = ({
                 : "text-neutral-900 dark:text-neutral-200";
 
             return (
-              <tr key={transaction.id} className="hover:bg-neutral-100 dark:hover:bg-neutral-800/40">
+              <tr
+                key={transaction.id}
+                className="hover:bg-neutral-100 dark:hover:bg-neutral-800/40"
+              >
                 <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   {transaction.date}
                 </td>
@@ -95,4 +98,3 @@ export const TransactionTable = ({
     </div>
   );
 };
-

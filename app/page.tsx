@@ -27,7 +27,7 @@ export default function Home() {
       try {
         const response = await fetch("/api/process-statement", {
           method: "POST",
-          body: formData
+          body: formData,
         });
 
         if (!response.ok) {
@@ -35,7 +35,7 @@ export default function Home() {
           throw new Error(message || "Failed to process statement.");
         }
 
-        const data = (await response.json());
+        const data = await response.json();
         setTransactions(data);
       } catch (err) {
         const message =
@@ -47,22 +47,22 @@ export default function Home() {
         setIsLoading(false);
       }
     },
-    []
+    [],
   );
 
   return (
     <main className="flex flex-1 flex-col gap-10">
       <section className="flex flex-col gap-12 justify-center items-center">
         <div className="flex flex-col gap-8 items-center">
-        <h1 className="text-xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-center">
-          Bank Statement Analyzer
-        </h1>
-        <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
-          Upload a bank statement PDF and we will extract and categorize every
-          transaction using Google Gemini, the Vercel AI SDK, and Langsmith
-          tracing. You can fine-tune the suggested categories before saving your
-          results elsewhere.
-        </p>
+          <h1 className="text-xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-center">
+            Bank Statement Analyzer
+          </h1>
+          <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
+            Upload a bank statement PDF and we will extract and categorize every
+            transaction using Google Gemini, the Vercel AI SDK, and Langsmith
+            tracing. You can fine-tune the suggested categories before saving
+            your results elsewhere.
+          </p>
         </div>
         <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
           <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
@@ -77,7 +77,9 @@ export default function Home() {
           />
         </label>
         {error ? (
-          <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">
+            {error}
+          </p>
         ) : null}
       </section>
 
@@ -99,4 +101,3 @@ export default function Home() {
     </main>
   );
 }
-
