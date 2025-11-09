@@ -52,8 +52,9 @@ export default function Home() {
 
   return (
     <main className="flex flex-1 flex-col gap-10">
-      <section className="flex flex-col gap-4 justify-center items-center">
-        <h1 className="text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight">
+      <section className="flex flex-col gap-12 justify-center items-center">
+        <div className="flex flex-col gap-8 items-center">
+        <h1 className="text-xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-center">
           Bank Statement Analyzer
         </h1>
         <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
@@ -62,6 +63,7 @@ export default function Home() {
           tracing. You can fine-tune the suggested categories before saving your
           results elsewhere.
         </p>
+        </div>
         <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
           <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
             {isLoading ? "Processing..." : "Select a bank statement (PDF)"}
