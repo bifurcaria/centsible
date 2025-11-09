@@ -5,6 +5,34 @@
 :root {
   color-scheme: light;
 }
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 0.7) 25%,
+    rgba(243, 244, 246, 1) 50%,
+    rgba(229, 231, 235, 0.7) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(38, 38, 38, 0.7) 25%,
+    rgba(24, 24, 27, 1) 50%,
+    rgba(38, 38, 38, 0.7) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
 
 @media (prefers-color-scheme: dark) {
   :root {

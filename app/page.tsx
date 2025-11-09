@@ -3,7 +3,7 @@
 import type { ChangeEvent } from "react";
 import { useCallback, useState } from "react";
 import { PdfPasswordPrompt } from "@/components/PdfPasswordPrompt";
-import { Summary } from "@/components/Summary";
+import { Analytics } from "@/components/Analytics";
 import { TransactionTable } from "@/components/TransactionTable";
 import { usePdfPasswordFlow } from "@/hooks/usePdfPasswordFlow";
 import type { Transaction } from "@/types/transaction";
@@ -11,6 +11,8 @@ import type { Transaction } from "@/types/transaction";
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCategorizing, setIsCategorizing] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {
     isOpen,
@@ -23,25 +25,64 @@ export default function Home() {
   } = usePdfPasswordFlow();
 
   const processUnencryptedFile = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
     setIsLoading(true);
+    setIsCategorizing(false);
     setError(null);
+    setTransactions([]);
 
     try {
-      const response = await fetch("/api/process-statement", {
+      // First LLM call: parse
+      const parseForm = new FormData();
+      parseForm.append("file", file);
+      const parseResponse = await fetch("/api/process-statement/parse", {
         method: "POST",
-        body: formData,
+        body: parseForm,
       });
 
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Failed to process statement.");
+      if (!parseResponse.ok) {
+        const message = await parseResponse.text();
+        throw new Error(message || "Failed to parse statement.");
       }
 
-      const data = await response.json();
-      setTransactions(data);
+      const parsed = (await parseResponse.json()) as Array<
+        Omit<Transaction, "category">
+      >;
+
+      // Show parsed transactions immediately; income labeled, expenses pending
+      const initial: Transaction[] = parsed.map((t) => ({
+        ...t,
+        category: t.amount >= 0 ? "Income" : "",
+      }));
+      setTransactions(initial);
+
+      // Second LLM call: categorize expenses
+      setIsCategorizing(true);
+      const expenses = initial
+        .filter((t) => t.amount < 0)
+        .map((t) => ({ id: t.id, description: t.description, amount: t.amount }));
+
+      const catResponse = await fetch("/api/process-statement/categorize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expenses }),
+      });
+
+      if (!catResponse.ok) {
+        const message = await catResponse.text();
+        throw new Error(message || "Failed to categorize expenses.");
+      }
+
+      const categorized = (await catResponse.json()) as Array<{
+        id: string;
+        category: string;
+      }>;
+
+      const catById = new Map(categorized.map((e) => [e.id, e.category]));
+      setTransactions((prev) =>
+        prev.map((t) =>
+          t.amount >= 0 ? t : { ...t, category: catById.get(t.id) ?? "Other" },
+        ),
+      );
     } catch (err) {
       const message =
         err instanceof Error
@@ -49,12 +90,15 @@ export default function Home() {
           : "An unexpected error occurred. Please try again.";
       setError(message);
     } finally {
+      setIsCategorizing(false);
       setIsLoading(false);
     }
   }, []);
 
   const processEncryptedFileWithPassword = useCallback(async () => {
     setIsLoading(true);
+    setIsCategorizing(false);
+    setHasSubmitted(true);
     setError(null);
 
     try {
@@ -67,21 +111,55 @@ export default function Home() {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("text", result.text);
-
-      const response = await fetch("/api/process-statement", {
+      // First LLM call: parse (with text)
+      const parseForm = new FormData();
+      parseForm.append("text", result.text);
+      const parseResponse = await fetch("/api/process-statement/parse", {
         method: "POST",
-        body: formData,
+        body: parseForm,
       });
 
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Failed to process statement.");
+      if (!parseResponse.ok) {
+        const message = await parseResponse.text();
+        throw new Error(message || "Failed to parse statement.");
       }
 
-      const data = await response.json();
-      setTransactions(data);
+      const parsed = (await parseResponse.json()) as Array<
+        Omit<Transaction, "category">
+      >;
+      const initial: Transaction[] = parsed.map((t) => ({
+        ...t,
+        category: t.amount >= 0 ? "Income" : "",
+      }));
+      setTransactions(initial);
+
+      // Second LLM call: categorize expenses
+      setIsCategorizing(true);
+      const expenses = initial
+        .filter((t) => t.amount < 0)
+        .map((t) => ({ id: t.id, description: t.description, amount: t.amount }));
+
+      const catResponse = await fetch("/api/process-statement/categorize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expenses }),
+      });
+
+      if (!catResponse.ok) {
+        const message = await catResponse.text();
+        throw new Error(message || "Failed to categorize expenses.");
+      }
+
+      const categorized = (await catResponse.json()) as Array<{
+        id: string;
+        category: string;
+      }>;
+      const catById = new Map(categorized.map((e) => [e.id, e.category]));
+      setTransactions((prev) =>
+        prev.map((t) =>
+          t.amount >= 0 ? t : { ...t, category: catById.get(t.id) ?? "Other" },
+        ),
+      );
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -89,6 +167,7 @@ export default function Home() {
           : "An unexpected error occurred. Please try again.";
       setError(message);
     } finally {
+      setIsCategorizing(false);
       setIsLoading(false);
     }
   }, [submitPassword]);
@@ -100,6 +179,7 @@ export default function Home() {
         return;
       }
 
+      setHasSubmitted(true);
       try {
         setError(null);
 
@@ -135,18 +215,20 @@ export default function Home() {
             your results elsewhere.
           </p>
         </div>
-        <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
-          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
-            {isLoading ? "Processing..." : "Select a bank statement (PDF)"}
-          </span>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={handleFileChange}
-            className="hidden"
-            disabled={isLoading}
-          />
-        </label>
+        {!hasSubmitted ? (
+          <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
+            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              Select a bank statement (PDF)
+            </span>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              className="hidden"
+              disabled={isLoading}
+            />
+          </label>
+        ) : null}
         {error ? (
           <p className="text-sm font-medium text-red-600 dark:text-red-400">
             {error}
@@ -165,13 +247,18 @@ export default function Home() {
         />
       </section>
 
-      {transactions.length > 0 ? (
+      {isLoading || transactions.length > 0 ? (
         <section className="flex flex-col gap-8">
+          <Analytics
+            transactions={transactions}
+            isCategorizing={isCategorizing}
+          />
           <TransactionTable
             transactions={transactions}
             setTransactions={setTransactions}
+            skeletonRowCount={isLoading && transactions.length === 0 ? 12 : 0}
+            isCategorizing={isCategorizing}
           />
-          <Summary transactions={transactions} />
         </section>
       ) : (
         <section className="flex flex-1 flex-col items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/40 p-12 text-center text-neutral-500 dark:text-neutral-400">

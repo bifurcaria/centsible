@@ -14,8 +14,10 @@
     "langsmith": "^0.3.63",
     "next": "14.2.12",
     "pdfjs-dist": "^4.7.76",
+    "chart.js": "^4.4.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
