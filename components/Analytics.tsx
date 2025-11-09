@@ -24,6 +24,10 @@ ChartJS.register(
   LineElement,
 );
 
+// Ensure charts use Instrument Sans to match the app typography
+ChartJS.defaults.font.family =
+  "'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
 type AnalyticsProps = {
   transactions: Transaction[];
   isCategorizing?: boolean;
