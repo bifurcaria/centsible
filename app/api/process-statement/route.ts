@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       ].join("\n\n");
 
       const categorizationResult = await generateObject({
-        model: google("gemini-2.5-pro"),
+        model: google("gemini-2.5-flash-lite"),
         schema: categorizationSchema,
         mode: "json",
         providerOptions: { langsmith: langsmithOptions },
