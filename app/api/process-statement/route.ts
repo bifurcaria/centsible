@@ -1,12 +1,12 @@
 import { google } from "@ai-sdk/google";
 import * as ai from "ai";
-import { NextResponse } from "next/server";
-import { z } from "zod";
 import { Client } from "langsmith";
 import {
-  wrapAISDK,
   createLangSmithProviderOptions,
+  wrapAISDK,
 } from "langsmith/experimental/vercel";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import type { Transaction } from "@/types/transaction";
@@ -39,24 +39,62 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file");
+    const text = formData.get("text");
 
-    if (!file || !(file instanceof File)) {
+    if (
+      (!file || !(file instanceof File)) &&
+      !(typeof text === "string" && text.trim().length > 0)
+    ) {
       return NextResponse.json(
-        { error: "A PDF file is required under the `file` key." },
+        {
+          error:
+            "Provide either a PDF under `file` or plain text under `text`.",
+        },
         { status: 400 },
       );
     }
 
-    const pdfBytes = await file.arrayBuffer();
     const parsingPrompt =
       "Extract all financial transactions from this bank statement. Incomes must be positive numbers, and expenses must be negative numbers.";
 
-    const parsingResult = await generateObject({
-      model: google("gemini-2.5-flash-lite"),
-      schema: parsingSchema,
-      mode: "json",
-      providerOptions: { langsmith: langsmithOptions },
-      messages: [
+    // Prepare parsing messages depending on input type (text vs file)
+    let messages:
+      | [
+          {
+            role: "user";
+            content:
+              | { type: "text"; text: string }[]
+              | (
+                  | {
+                      type: "file";
+                      data: Uint8Array;
+                      mediaType: "application/pdf";
+                    }
+                  | { type: "text"; text: string }
+                )[];
+          },
+        ]
+      | undefined;
+
+    if (typeof text === "string" && text.trim().length > 0) {
+      messages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: [
+                parsingPrompt,
+                "Here is the statement text to extract transactions from:",
+                text,
+              ].join("\n\n"),
+            },
+          ],
+        },
+      ];
+    } else {
+      const pdfBytes = await (file as File).arrayBuffer();
+      messages = [
         {
           role: "user",
           content: [
@@ -71,7 +109,15 @@ export async function POST(request: Request) {
             },
           ],
         },
-      ],
+      ];
+    }
+
+    const parsingResult = await generateObject({
+      model: google("gemini-2.5-flash-lite"),
+      schema: parsingSchema,
+      mode: "json",
+      providerOptions: { langsmith: langsmithOptions },
+      messages,
     });
 
     const parsedTransactions = parsingResult.object.map(

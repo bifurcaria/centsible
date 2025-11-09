@@ -1,15 +1,97 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import type { ChangeEvent } from "react";
+import { useCallback, useState } from "react";
+import { PdfPasswordPrompt } from "@/components/PdfPasswordPrompt";
 import { Summary } from "@/components/Summary";
 import { TransactionTable } from "@/components/TransactionTable";
+import { usePdfPasswordFlow } from "@/hooks/usePdfPasswordFlow";
 import type { Transaction } from "@/types/transaction";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {
+    isOpen,
+    password,
+    passwordError,
+    setPassword,
+    checkNeedsPassword,
+    submitPassword,
+    cancel,
+  } = usePdfPasswordFlow();
+
+  const processUnencryptedFile = useCallback(async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/process-statement", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "Failed to process statement.");
+      }
+
+      const data = await response.json();
+      setTransactions(data);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred. Please try again.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const processEncryptedFileWithPassword = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await submitPassword();
+      if (!result.ok) {
+        // password errors are handled inside the hook; generic errors surface here
+        if (result.reason === "generic" && result.message) {
+          throw new Error(result.message);
+        }
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("text", result.text);
+
+      const response = await fetch("/api/process-statement", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "Failed to process statement.");
+      }
+
+      const data = await response.json();
+      setTransactions(data);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred. Please try again.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [submitPassword]);
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -18,36 +100,25 @@ export default function Home() {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", file);
-
-      setIsLoading(true);
-      setError(null);
-
       try {
-        const response = await fetch("/api/process-statement", {
-          method: "POST",
-          body: formData,
-        });
+        setError(null);
 
-        if (!response.ok) {
-          const message = await response.text();
-          throw new Error(message || "Failed to process statement.");
+        const status = await checkNeedsPassword(file);
+        if (status === "needsPassword") {
+          return;
         }
 
-        const data = await response.json();
-        setTransactions(data);
+        // Not password-protected; proceed with existing flow
+        await processUnencryptedFile(file);
       } catch (err) {
         const message =
           err instanceof Error
             ? err.message
             : "An unexpected error occurred. Please try again.";
         setError(message);
-      } finally {
-        setIsLoading(false);
       }
     },
-    [],
+    [checkNeedsPassword, processUnencryptedFile],
   );
 
   return (
@@ -81,6 +152,17 @@ export default function Home() {
             {error}
           </p>
         ) : null}
+        <PdfPasswordPrompt
+          open={isOpen}
+          password={password}
+          error={passwordError}
+          disabled={isLoading}
+          onPasswordChange={setPassword}
+          onSubmit={() => processEncryptedFileWithPassword()}
+          onCancel={() => {
+            cancel();
+          }}
+        />
       </section>
 
       {transactions.length > 0 ? (
