@@ -1,8 +1,9 @@
 import { google } from "@ai-sdk/google";
-import { generateObject } from "ai";
+import * as ai from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Client } from "langsmith";
+import { wrapAISDK, createLangSmithProviderOptions } from "langsmith/experimental/vercel";
 
 import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import type { Transaction } from "@/types/transaction";
@@ -28,6 +29,8 @@ const categorizationSchema = z.array(
 
 export async function POST(request: Request) {
   const client = new Client();
+  const { generateObject } = wrapAISDK(ai);
+  const langsmithOptions = createLangSmithProviderOptions<typeof ai.generateObject>();
 
   try {
     const formData = await request.formData();
@@ -48,6 +51,7 @@ export async function POST(request: Request) {
       model: google("gemini-2.5-flash-lite"),
       schema: parsingSchema,
       mode: "json",
+      providerOptions: { langsmith: langsmithOptions },
       messages: [
         {
           role: "user",
@@ -99,6 +103,7 @@ export async function POST(request: Request) {
         model: google("gemini-2.5-pro"),
         schema: categorizationSchema,
         mode: "json",
+        providerOptions: { langsmith: langsmithOptions },
         prompt: categorizationPrompt
       });
 
