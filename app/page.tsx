@@ -206,16 +206,16 @@ export default function Home() {
       <section className="flex flex-col gap-12 justify-center items-center">
         <div className="flex flex-col gap-8 items-center">
           <h1 className="text-xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-center">
-            Bank Statement Analyzer
+            Statement Analyzer
           </h1>
           <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
-            Upload a bank statement PDF and let AI extract, categorize, and summarize your spending.
+            Upload a bank or credit card statement PDF and let AI extract, categorize, and summarize your spending.
           </p>
         </div>
         {!hasSubmitted ? (
           <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
             <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
-              Select a bank statement (PDF)
+              Select a statement (PDF)
             </span>
             <input
               type="file"

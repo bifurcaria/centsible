@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     const parsingPrompt =
-      "Extract all financial transactions from this bank statement. Incomes must be positive numbers, and expenses must be negative numbers.";
+      "Extract all financial transactions from this statement (bank or credit card). Normalize amounts regardless of how they appear in the document: expenses/purchases/charges must be negative numbers, and income/credits/refunds/payments must be positive numbers. If the statement is a credit card statement, purchases should be negative and payments/refunds should be positive. Infer the correct sign when it is missing or ambiguous.";
 
     let messages:
       | [
