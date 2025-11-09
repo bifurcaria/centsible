@@ -5,29 +5,33 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Centsible - Bank Statement Analyzer",
   description:
-    "Upload a bank statement PDF and let AI extract, categorize, and summarize your spending."
+    "Upload a bank statement PDF and let AI extract, categorize, and summarize your spending.",
 };
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   weight: "400",
-  display: "swap"
+  display: "swap",
 });
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   variable: "--font-serif",
   weight: "400",
-  display: "swap"
+  display: "swap",
 });
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" data-mode="clear" className={`${instrumentSans.variable} ${instrumentSerif.variable}`}>
+    <html
+      lang="en"
+      data-mode="clear"
+      className={`${instrumentSans.variable} ${instrumentSerif.variable}`}
+    >
       <body className="min-h-screen bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
         <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-10">
           {children}
@@ -36,4 +40,3 @@ export default function RootLayout({
     </html>
   );
 }
-

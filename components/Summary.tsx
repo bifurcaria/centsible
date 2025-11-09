@@ -7,7 +7,7 @@ type SummaryProps = {
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD"
+  currency: "USD",
 });
 
 const formatPercent = (value: number) =>
@@ -17,7 +17,7 @@ export const Summary = ({ transactions }: SummaryProps) => {
   const expenses = transactions.filter((transaction) => transaction.amount < 0);
   const totalExpenses = expenses.reduce(
     (sum, transaction) => sum + Math.abs(transaction.amount),
-    0
+    0,
   );
 
   const totalsByCategory = EXPENSE_CATEGORIES.map((category) => {
@@ -28,7 +28,7 @@ export const Summary = ({ transactions }: SummaryProps) => {
     return {
       category,
       total,
-      percent: totalExpenses === 0 ? 0 : (total / totalExpenses) * 100
+      percent: totalExpenses === 0 ? 0 : (total / totalExpenses) * 100,
     };
   }).filter((entry) => entry.total > 0);
 
@@ -81,5 +81,3 @@ export const Summary = ({ transactions }: SummaryProps) => {
     </section>
   );
 };
-
-

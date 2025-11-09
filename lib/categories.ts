@@ -4,7 +4,5 @@ export const EXPENSE_CATEGORIES = [
   "Utilities",
   "Transport",
   "Shopping",
-  "Other"
+  "Other",
 ];
-
-
