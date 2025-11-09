@@ -1,6 +1,5 @@
-import { Buffer } from "node:buffer";
 import { google } from "@ai-sdk/google";
-import { generateObject, type LanguageModel } from "ai";
+import { generateObject } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Client } from "langsmith";
