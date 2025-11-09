@@ -35,7 +35,7 @@ export default function Home() {
           throw new Error(message || "Failed to process statement.");
         }
 
-        const data = (await response.json()) as Transaction[];
+        const data = (await response.json());
         setTransactions(data);
       } catch (err) {
         const message =
