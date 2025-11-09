@@ -52,18 +52,18 @@ export default function Home() {
 
   return (
     <main className="flex flex-1 flex-col gap-10">
-      <section className="flex flex-col gap-4">
-        <h1 className="text-4xl font-semibold tracking-tight">
+      <section className="flex flex-col gap-4 justify-center items-center">
+        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight">
           Bank Statement Analyzer
         </h1>
-        <p className="max-w-2xl text-base text-slate-300">
+        <p className="max-w-2xl text-base text-neutral-600 dark:text-neutral-300 text-center">
           Upload a bank statement PDF and we will extract and categorize every
           transaction using Google Gemini, the Vercel AI SDK, and Langsmith
           tracing. You can fine-tune the suggested categories before saving your
           results elsewhere.
         </p>
-        <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-slate-600 bg-slate-900 px-4 py-6 text-center transition hover:border-slate-400">
-          <span className="text-sm font-medium text-slate-200">
+        <label className="flex w-full max-w-sm cursor-pointer flex-col items-center rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 px-4 py-6 text-center transition hover:border-neutral-400">
+          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
             {isLoading ? "Processing..." : "Select a bank statement (PDF)"}
           </span>
           <input
@@ -75,7 +75,7 @@ export default function Home() {
           />
         </label>
         {error ? (
-          <p className="text-sm font-medium text-red-400">{error}</p>
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
         ) : null}
       </section>
 
@@ -88,7 +88,7 @@ export default function Home() {
           <Summary transactions={transactions} />
         </section>
       ) : (
-        <section className="flex flex-1 flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">
+        <section className="flex flex-1 flex-col items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/40 p-12 text-center text-neutral-500 dark:text-neutral-400">
           <p className="max-w-md text-sm leading-6">
             No transactions yet. Upload a statement above to begin.
           </p>

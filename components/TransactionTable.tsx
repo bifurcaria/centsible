@@ -25,40 +25,40 @@ export const TransactionTable = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/60 shadow-sm">
-      <table className="min-w-full divide-y divide-slate-800">
-        <thead className="bg-slate-900/80">
+    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/60 shadow-sm">
+      <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
+        <thead className="bg-neutral-100 dark:bg-neutral-900/80">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
               Date
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
               Description
             </th>
-            <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
               Amount
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
               Category
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800">
+        <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
           {transactions.map((transaction) => {
             const isExpense = transaction.amount < 0;
             const isIncome = transaction.amount > 0;
             const amountClass = isExpense
-              ? "text-red-400"
+              ? "text-red-600 dark:text-red-400"
               : isIncome
-                ? "text-emerald-400"
-                : "text-slate-200";
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-neutral-900 dark:text-neutral-200";
 
             return (
-              <tr key={transaction.id} className="hover:bg-slate-800/40">
-                <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-100">
+              <tr key={transaction.id} className="hover:bg-neutral-100 dark:hover:bg-neutral-800/40">
+                <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   {transaction.date}
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-300">
+                <td className="px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300">
                   {transaction.description}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-semibold">
@@ -66,14 +66,14 @@ export const TransactionTable = ({
                     {formatter.format(transaction.amount)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-200">
+                <td className="px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200">
                   {isIncome ? (
                     <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-400">
                       Income
                     </span>
                   ) : (
                     <select
-                      className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500/40"
+                      className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500/40"
                       value={transaction.category}
                       onChange={(event) =>
                         handleCategoryChange(transaction.id, event.target.value)
