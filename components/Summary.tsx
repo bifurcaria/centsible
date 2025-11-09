@@ -33,13 +33,13 @@ export const Summary = ({ transactions }: SummaryProps) => {
   }).filter((entry) => entry.total > 0);
 
   return (
-    <section className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
+    <section className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
       <header className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-100">
+          <h2 className="text-xl font-semibold text-zinc-100">
             Spending Summary
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-zinc-400">
             Totals reflect expenses only and exclude income transactions.
           </p>
         </div>
@@ -54,7 +54,7 @@ export const Summary = ({ transactions }: SummaryProps) => {
       </header>
 
       {totalsByCategory.length === 0 ? (
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-zinc-400">
           No expenses detected yet. Upload a statement to see your spending
           breakdown.
         </p>
@@ -63,15 +63,15 @@ export const Summary = ({ transactions }: SummaryProps) => {
           {totalsByCategory.map((entry) => (
             <li
               key={entry.category}
-              className="flex flex-col gap-1 rounded-md border border-slate-800 bg-slate-950/60 px-4 py-3"
+              className="flex flex-col gap-1 rounded-md border border-zinc-800 bg-zinc-950/60 px-4 py-3"
             >
-              <span className="text-sm font-semibold text-slate-200">
+              <span className="text-sm font-semibold text-zinc-200">
                 {entry.category}
               </span>
-              <span className="text-base font-medium text-slate-100">
+              <span className="text-base font-medium text-zinc-100">
                 {currency.format(-entry.total)}
               </span>
-              <span className="text-xs uppercase tracking-wide text-slate-400">
+              <span className="text-xs uppercase tracking-wide text-zinc-400">
                 {formatPercent(entry.percent)} of expenses
               </span>
             </li>
